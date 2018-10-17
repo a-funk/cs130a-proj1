@@ -7,11 +7,11 @@ using namespace std;
 
 int main(){
 	int var=0;
-	Blockchain b;
+	Blockchain *b = new Blockchain();
 	cout << "Welcome to the transaction-chain application..." << "\n";
 	while(var!=4){
 				 cout << "1) Add a transaction to the chain." << "\n"
-				 << "2) Find a transaction with the name of receiver or  sender." << "\n"
+				 << "2) Find a transaction with the name of receiver or sender." << "\n"
 				 << "3) Verify and print the chain." << "\n"
 				 << "4) Exit the program\n";
 
@@ -26,7 +26,6 @@ int main(){
 					cout << "Please enter an integer and try again.\n";
 					return 0;
 				}
-
 				string sender="";
 				cout << "Sender: ";
 				cin >> sender;
@@ -34,19 +33,21 @@ int main(){
 				string reciever="";
 				cout << "Reciever: ";
 				cin >> reciever;
-				b.addTrans(amount, sender, reciever);
+				b->addTrans(amount, sender, reciever);
 			}	
 			// Executes Find Transaction
 			else if(var == 2){
 				string sender="";
 				cout << "Sender/Reciever: ";
 				cin >> sender;
-			
-				b.findUser(sender);
+				if(sender == ""){
+					b->printBlockchain();
+				}
+				b->findUser(sender);
 			}
 			// Executes Verify Chain
 			else if(var == 3){
-				b.verifyBlockchain();
+				b->verifyBlockchain();
 			}
 			else if(var == 4){
 				cout << "Have a great day.\n";

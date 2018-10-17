@@ -3,9 +3,6 @@
 Blockchain::Blockchain(){
 	this->head=NULL;
 }
-Blockchain::Blockchain(Transaction *t){
-	this->head=t;
-}
 
 void Blockchain::addTrans(int amount, string sender, string reciever){
 	Transaction *t = new Transaction(amount, sender, reciever);
@@ -69,8 +66,14 @@ void Blockchain::printBlock(Transaction *t){
 	int amount = t->getAmount();
 	string sender = t->getSender();
 	string reciever = t->getReciever();
-	string nonce = t->getNonce();
-	string hash = t->getHash();
+	string nonce = "";
+	string hash = "";
+	if(!t->getNonce().empty()){
+		nonce = t->getNonce();
+	}
+	if(!t->getHash().empty()){
+		hash = t->getHash();
+	}
 	cout << "\n";
 	cout << "Amount: \t" << to_string(amount) << "\n";
 	cout << "Sender: \t" << sender << "\n";
@@ -80,8 +83,16 @@ void Blockchain::printBlock(Transaction *t){
 	cout << "\n";
 }
 
-void Blockchain::findUser(string s){
+int Blockchain::findUser(string s){
+	if(s==""){
+		cout << "This string is empty. Can't do dat\n.";
+		printBlockchain();
+		return 0;
+	}
 	bool found=false;
+	if(this->head==NULL){
+		printBlockchain();
+	}
 	Transaction *next = this->head;
 	while(next){
 		if(next->getSender().compare(s)==0){
@@ -97,40 +108,59 @@ void Blockchain::findUser(string s){
 	if(!found){
 		cout << "User not found within chain please try a different user.\n";
 	}
+	return 0;
 }
 void Blockchain::printBlockchain(){
-		Transaction *tmp = head;
-		while(tmp){
-			printBlock(tmp);
-			tmp = tmp->getNext();
+		if(head!=NULL){	
+			Transaction *tmp = head;
+			while(tmp){
+				printBlock(tmp);
+				tmp = tmp->getNext();
+			}
+		}
+		else{
+			cout << "This blockchain is empty you silly TA.\n :)\n";
 		}
 	
 }
 
 bool Blockchain::verifyBlockchain(){
+
+if(this->head!=NULL){
 	Transaction *curr = this->head;
-	Transaction *next = this->head->getNext();
-	while(next){
-		string amount = to_string(next->getAmount());
-		string sender = next->getSender();
-		string reciever = next->getReciever();
-		string nonce = curr->getNonce();
-		string h = amount+sender+reciever+nonce;
-		string _hash = generateHash(h);
-		
-		if(_hash.compare(curr->getHash())!=0){
-			cout << "BLOCKCHAIN FAILED VERIFICATION\n" 
-					<< "INCORRECT BLOCKS BELOW\n"<< "--------------------\n";
-			printBlock(curr);
-			printBlock(next);
-			return false;
-		}
+	if(this->head->getNext()!=NULL){
+		Transaction *next = this->head->getNext();
+		while(next){
+			string amount = to_string(next->getAmount());
+			string sender = next->getSender();
+			string reciever = next->getReciever();
+			string nonce = curr->getNonce();
+			string h = amount+sender+reciever+nonce;
+			string _hash = generateHash(h);
+			
+			if(_hash.compare(curr->getHash())!=0){
+				cout << "BLOCKCHAIN FAILED VERIFICATION\n" 
+						<< "INCORRECT BLOCKS BELOW\n"<< "--------------------\n";
+				printBlock(curr);
+				printBlock(next);
+				return false;
+			}
 		Transaction *tmp = curr;
 		curr=next;
 		next=next->getNext();
+		}
+	cout << "---------------------------------------\n";
+	cout << "BLOCKCHAIN VERIFIED\n" << "PRINTING CHAIN:\n";
+	printBlockchain();
+	return true;
 	}
 	cout << "---------------------------------------\n";
 	cout << "BLOCKCHAIN VERIFIED\n" << "PRINTING CHAIN:\n";
 	printBlockchain();
 	return true;
+}
+else{
+	printBlockchain();
+	return true; //Returns true but could be an empty chain.  It will print its empty if thats the case.
+	}
 }
